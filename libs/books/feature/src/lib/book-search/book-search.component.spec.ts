@@ -12,6 +12,7 @@ import {
   getBooksError,
   getBooksLoaded,
   searchBooks,
+  removeFromReadingList,
 } from '@tmo/books/data-access';
 
 import { BooksFeatureModule } from '../books-feature.module';
@@ -23,6 +24,8 @@ Object.defineProperty(window, 'matchMedia', {
     matches: false,
     media: query,
     onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
@@ -165,5 +168,31 @@ describe('BookSearch Component', () => {
       });
 
     expect(store.dispatch).not.toHaveBeenCalledWith(clearSearch());
+  });
+
+  it('should remove book from readinglist on undo action of snackbar', () => {
+    const bookToRead = { ...createBook('9U5I_tskq9MC'), isAdded: false };
+
+    store.overrideSelector(getAllBooks, [
+      { ...bookToRead },
+      { ...createBook('qU3rAgAAQBAJ'), isAdded: false, publishedDate: null },
+      { ...createBook('PXa2bby0oQ0C'), isAdded: false }
+    ]);
+
+    const searchCtrl = fixture.debugElement.query(By.css('#searchInput'));
+    searchCtrl.nativeElement.value = 'javascript';
+    searchCtrl.nativeElement.dispatchEvent(new Event('input'));
+    store.refreshState();
+    fixture.detectChanges();
+
+    const btnWantToRead = fixture.debugElement.query(By.css('#wantToRead-9U5I_tskq9MC'));
+    btnWantToRead.nativeElement.click();
+
+    const btnUndoAddToReadingList = (<HTMLScriptElement><any>document.querySelector('.mat-simple-snackbar-action .mat-button'));
+    btnUndoAddToReadingList.click();
+
+    expect(store.dispatch).toHaveBeenCalledWith(
+      removeFromReadingList({ item: { bookId: bookToRead.id, ...bookToRead } })
+    );
   });
 });

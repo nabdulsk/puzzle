@@ -30,3 +30,13 @@ a {
     color: $pink-dark;
   }
 }
+
+.mat-simple-snackbar span {
+  color:#ffffff;
+}
+.mat-simple-snackbar-action .mat-button span {
+  color:$pink-accent;
+}
+.mat-snack-bar-container {
+  background-color: #171b14;
+}
