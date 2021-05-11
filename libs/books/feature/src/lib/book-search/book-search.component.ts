@@ -1,7 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  takeUntil
+} from 'rxjs/operators';
 
 import { Store } from '@ngrx/store';
 
@@ -21,7 +27,7 @@ import { Book } from '@tmo/shared/models';
   templateUrl: './book-search.component.html',
   styleUrls: ['./book-search.component.scss']
 })
-export class BookSearchComponent {
+export class BookSearchComponent implements OnInit, OnDestroy {
   loaderConfig = {
     color: 'primary',
     mode: 'indeterminate',
@@ -33,11 +39,24 @@ export class BookSearchComponent {
   books$: Observable<ReadingListBook[]> = this.store.select(getAllBooks);
   error$: Observable<any> = this.store.select(getBooksError);
   loader$: Observable<boolean> = this.store.select(getBooksLoaded);
+  searchKey$: Observable<{ term: string }> = this.searchForm.valueChanges.pipe(
+    filter(key => key.term.trim()),
+    debounceTime(500),
+    distinctUntilChanged()
+  );
+
+  unSubscribe$ = new Subject();
 
   constructor(
     private readonly store: Store,
     private readonly fb: FormBuilder
-  ) {}
+  ) { }
+
+  ngOnInit() {
+    this.searchKey$
+      .pipe(takeUntil(this.unSubscribe$))
+      .subscribe(searchKey => { this.searchBooks(searchKey.term) });
+  }
 
   get searchTerm(): string {
     return this.searchForm.value.term;
@@ -55,13 +74,14 @@ export class BookSearchComponent {
 
   searchExample() {
     this.searchForm.controls.term.setValue('javascript');
-    this.searchBooks();
+    this.searchBooks(null);
   }
 
-  searchBooks() {
-    if (this.searchForm.value.term.trim()) {
+  searchBooks(term: string | void) {
+    const searchTerm = term ? term : this.searchTerm.trim();
 
-      this.store.dispatch(searchBooks({ term: encodeURIComponent(this.searchTerm) }));
+    if (searchTerm) {
+      this.store.dispatch(searchBooks({ term: encodeURIComponent(searchTerm) }));
       return;
     }
 
@@ -72,5 +92,10 @@ export class BookSearchComponent {
     if (!this.searchForm.value.term) {
       this.store.dispatch(clearSearch());
     }
+  }
+
+  ngOnDestroy() {
+    this.unSubscribe$.next();
+    this.unSubscribe$.complete();
   }
 }

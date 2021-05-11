@@ -1,11 +1,13 @@
 import { HttpService, Injectable } from '@nestjs/common';
-import { Book } from '@tmo/shared/models';
+
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+
+import { Book } from '@tmo/shared/models';
 
 @Injectable()
 export class BooksService {
-  constructor(private readonly http: HttpService) {}
+  constructor(private readonly http: HttpService) { }
 
   search(term: string): Observable<Book[]> {
     if (!term) {
@@ -29,7 +31,7 @@ export class BooksService {
               coverUrl: item.volumeInfo?.imageLinks?.thumbnail
             };
           });
-        })
+        }), catchError(error => { throw error; })
       );
   }
 }

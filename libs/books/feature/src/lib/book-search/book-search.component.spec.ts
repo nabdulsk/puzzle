@@ -1,6 +1,6 @@
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { By } from '@angular/platform-browser';
 
@@ -166,4 +166,24 @@ describe('BookSearch Component', () => {
 
     expect(store.dispatch).not.toHaveBeenCalledWith(clearSearch());
   });
+
+  it('should show books with respect to user input while typing', fakeAsync(() => {
+    const searchCtrl = fixture.debugElement.query(By.css('#searchInput'));
+    searchCtrl.nativeElement.value = 'nodejs';
+    searchCtrl.nativeElement.dispatchEvent(new Event('input'));
+    tick(500);
+
+    expect(component.searchForm.value.term).toEqual('nodejs');
+    expect(store.dispatch).toHaveBeenCalledWith(searchBooks({ term: 'nodejs' }));
+  }));
+
+  it('should show error message when user types an input input', fakeAsync(() => {
+    const searchCtrl = fixture.debugElement.query(By.css('#searchInput'));
+    searchCtrl.nativeElement.value = '#';
+    searchCtrl.nativeElement.dispatchEvent(new Event('input'));
+    tick(500);
+
+    expect(component.searchForm.value.term).toEqual('#');
+    expect(store.dispatch).toHaveBeenCalledWith(searchBooks({ term: encodeURIComponent('#') }));
+  }));
 });
