@@ -7,8 +7,7 @@
           <button
             data-testing="toggle-reading-list"
             mat-button
-            (click)="drawer.toggle()"
-          >
+            (click)="drawer.toggle()">
             Reading List
             <tmo-total-count></tmo-total-count>
           </button>
@@ -23,7 +22,10 @@
     <div class="reading-list-container" data-testing="reading-list-container">
       <h2>
         My Reading List
-        <button mat-icon-button (click)="drawer.close()">
+        <button
+          id="btnReadingListToggle"
+          mat-icon-button
+          (click)="drawer.close()">
           <mat-icon>close</mat-icon>
         </button>
       </h2>
