@@ -1,5 +1,6 @@
 import { booksAdapter, initialState } from './books.reducer';
 import * as BooksSelectors from './books.selectors';
+
 import { createBook } from '@tmo/shared/testing';
 
 describe('Books Selectors', () => {
@@ -23,7 +24,7 @@ describe('Books Selectors', () => {
       const results = BooksSelectors.getBooks(state);
 
       expect(results.length).toBe(3);
-      expect(results.map(x => x.id)).toEqual(['A', 'B', 'C']);
+      expect(results.map(book => book.id)).toEqual(['A', 'B', 'C']);
     });
 
     it("getBooksLoaded() should return the current 'loaded' status", () => {
