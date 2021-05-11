@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
+
 import * as fromBooks from './+state/books.reducer';
 import { BooksEffects } from './+state/books.effects';
 import * as fromReadingList from './+state/reading-list.reducer';

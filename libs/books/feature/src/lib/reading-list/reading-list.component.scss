@@ -1,5 +1,9 @@
 @import 'variables.scss';
 
+h4{
+  margin:0;
+}
+
 :host {
   display: block;
   font-size: 0.75rem;

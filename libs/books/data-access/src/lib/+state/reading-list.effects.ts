@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Actions, createEffect, ofType, OnInitEffects } from '@ngrx/effects';
+
 import { of } from 'rxjs';
 import { catchError, concatMap, exhaustMap, map } from 'rxjs/operators';
+
+import { Actions, createEffect, ofType, OnInitEffects } from '@ngrx/effects';
+
 import { ReadingListItem } from '@tmo/shared/models';
 import * as ReadingListActions from './reading-list.actions';
 
@@ -13,12 +16,8 @@ export class ReadingListEffects implements OnInitEffects {
       ofType(ReadingListActions.init),
       exhaustMap(() =>
         this.http.get<ReadingListItem[]>('/api/reading-list').pipe(
-          map((data) =>
-            ReadingListActions.loadReadingListSuccess({ list: data })
-          ),
-          catchError((error) =>
-            of(ReadingListActions.loadReadingListError({ error }))
-          )
+          map(data => ReadingListActions.loadReadingListSuccess({ list: data })),
+          catchError(error => of(ReadingListActions.loadReadingListError({ error })))
         )
       )
     )
@@ -43,12 +42,8 @@ export class ReadingListEffects implements OnInitEffects {
       ofType(ReadingListActions.removeFromReadingList),
       concatMap(({ item }) =>
         this.http.delete(`/api/reading-list/${item.bookId}`).pipe(
-          map(() =>
-            ReadingListActions.confirmedRemoveFromReadingList({ item })
-          ),
-          catchError(() =>
-            of(ReadingListActions.failedRemoveFromReadingList({ item }))
-          )
+          map(() => ReadingListActions.confirmedRemoveFromReadingList({ item })),
+          catchError(() => of(ReadingListActions.failedRemoveFromReadingList({ item })))
         )
       )
     )
@@ -58,5 +53,5 @@ export class ReadingListEffects implements OnInitEffects {
     return ReadingListActions.init();
   }
 
-  constructor(private actions$: Actions, private http: HttpClient) {}
+  constructor(private actions$: Actions, private http: HttpClient) { }
 }

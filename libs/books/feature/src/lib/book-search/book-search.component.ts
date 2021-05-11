@@ -1,13 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+
+import { Observable } from 'rxjs';
+
 import { Store } from '@ngrx/store';
+
 import {
   addToReadingList,
   clearSearch,
   getAllBooks,
   ReadingListBook,
-  searchBooks
+  searchBooks,
+  getBooksError,
+  getBooksLoaded
 } from '@tmo/books/data-access';
-import { FormBuilder } from '@angular/forms';
 import { Book } from '@tmo/shared/models';
 
 @Component({
@@ -15,12 +21,18 @@ import { Book } from '@tmo/shared/models';
   templateUrl: './book-search.component.html',
   styleUrls: ['./book-search.component.scss']
 })
-export class BookSearchComponent implements OnInit {
-  books: ReadingListBook[];
+export class BookSearchComponent {
+  loaderConfig = {
+    color: 'primary',
+    mode: 'indeterminate',
+    value: 50
+  };
 
-  searchForm = this.fb.group({
-    term: ''
-  });
+  searchForm: FormGroup = this.fb.group({ term: '' });
+
+  books$: Observable<ReadingListBook[]> = this.store.select(getAllBooks);
+  error$: Observable<any> = this.store.select(getBooksError);
+  loader$: Observable<boolean> = this.store.select(getBooksLoaded);
 
   constructor(
     private readonly store: Store,
@@ -31,16 +43,10 @@ export class BookSearchComponent implements OnInit {
     return this.searchForm.value.term;
   }
 
-  ngOnInit(): void {
-    this.store.select(getAllBooks).subscribe(books => {
-      this.books = books;
-    });
-  }
-
-  formatDate(date: void | string) {
-    return date
-      ? new Intl.DateTimeFormat('en-US').format(new Date(date))
-      : undefined;
+  formatDate(date: string) {
+    if (date) {
+      return new Intl.DateTimeFormat('en-US').format(new Date(date));
+    }
   }
 
   addBookToReadingList(book: Book) {
@@ -53,9 +59,17 @@ export class BookSearchComponent implements OnInit {
   }
 
   searchBooks() {
-    if (this.searchForm.value.term) {
-      this.store.dispatch(searchBooks({ term: this.searchTerm }));
-    } else {
+    if (this.searchForm.value.term.trim()) {
+
+      this.store.dispatch(searchBooks({ term: encodeURIComponent(this.searchTerm) }));
+      return;
+    }
+
+    this.store.dispatch(clearSearch());
+  }
+
+  checkSearchKey() {
+    if (!this.searchForm.value.term) {
       this.store.dispatch(clearSearch());
     }
   }

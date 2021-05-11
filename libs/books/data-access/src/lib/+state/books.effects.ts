@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+
 import { Book } from '@tmo/shared/models';
 import * as BooksActions from './books.actions';
 

@@ -1,11 +1,32 @@
 @import 'variables.scss';
 
+h4 {
+  margin: 0;
+}
+
 form {
   margin-bottom: $spacing-xs;
 }
 
+.card {
+  height: 100%;
+  background: #FFFFFF;
+  margin: 2px;
+  transition: all .25s linear;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
+}
+
 .mat-form-field {
   width: 100%;
+}
+
+.mat-card-actions {
+  margin: 0;
+  padding: 0;
+
+  button {
+    float: right;
+  }
 }
 
 .book-grid {
@@ -43,11 +64,11 @@ form {
   flex-direction: column;
   font-size: 0.8rem;
 
-  > div {
+  >div {
     margin-bottom: $spacing-xxs;
   }
 
-  > div:last-child {
+  >div:last-child {
     margin: 0;
     flex: 1;
     position: relative;
@@ -68,5 +89,11 @@ form {
   justify-content: center;
   min-height: 50vh;
   font-size: 1.5rem;
-  color: $gray40;
+  color: $gray80;
+}
+
+.spinner-container,
+.error-container {
+  display: flex;
+  justify-content: center;
 }
