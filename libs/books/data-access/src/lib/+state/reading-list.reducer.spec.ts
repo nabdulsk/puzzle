@@ -90,6 +90,30 @@ describe('ReadingList Reducer', () => {
 
       expect(result.error).toEqual('Internal server error');
     });
+
+    it('should show mark as finishied icon in the reading list on finishReadingBookSuccess', () => {
+      const action = ReadingListActions.finishReadingBookSuccess({
+        item: {
+          ...createReadingListItem('A'),
+          finished: true,
+          finishedDate: new Date().toISOString()
+        }
+      });
+
+      const result: State = reducer(state, action);
+
+      expect(result.entities['A'].finished).toBeTruthy();
+    });
+
+    it('should show error message on finishReadingBookFailure', () => {
+      const action = ReadingListActions.finishReadingBookError({
+        error: 'Internal server error'
+      });
+
+      const result: State = reducer(state, action);
+
+      expect(result.error).toEqual('Internal server error');
+    });
   });
 
   describe('unknown action', () => {

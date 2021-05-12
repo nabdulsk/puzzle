@@ -4,7 +4,11 @@ import { Observable } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 
-import { getReadingList, removeFromReadingList } from '@tmo/books/data-access';
+import {
+  finishReadingBook,
+  getReadingList,
+  removeFromReadingList
+} from '@tmo/books/data-access';
 import { ReadingListItem } from '@tmo/shared/models';
 
 @Component({
@@ -20,5 +24,9 @@ export class ReadingListComponent {
 
   removeFromReadingList(item: ReadingListItem) {
     this.store.dispatch(removeFromReadingList({ item }));
+  }
+
+  markAsFinish(item: ReadingListItem): void {
+    this.store.dispatch(finishReadingBook({ item }));
   }
 }

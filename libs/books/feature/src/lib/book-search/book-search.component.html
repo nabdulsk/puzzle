@@ -59,7 +59,7 @@
                 [attr.aria-label]="'Add ' + book?.title + ' to reading list'"
                 [attr.aria-disabled]="book?.isAdded"
                 [disabled]="book?.isAdded">
-                Want to Read
+                {{book?.finished ? 'Finished': 'Want to Read'}}
               </button>
             </mat-card-actions>
           </div>
