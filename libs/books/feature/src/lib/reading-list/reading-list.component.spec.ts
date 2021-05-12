@@ -5,9 +5,22 @@ import { provideMockStore, MockStore } from '@ngrx/store/testing';
 
 import { createReadingListItem, SharedTestingModule } from '@tmo/shared/testing';
 import { BooksFeatureModule } from '@tmo/books/feature';
-import { getReadingList, removeFromReadingList } from '@tmo/books/data-access';
-
+import { finishReadingBook, getReadingList, removeFromReadingList } from '@tmo/books/data-access';
 import { ReadingListComponent } from './reading-list.component';
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
 
 describe('ReadingList Component', () => {
   let component: ReadingListComponent;
@@ -45,5 +58,15 @@ describe('ReadingList Component', () => {
     btnRemove.nativeElement.click();
 
     expect(store.dispatch).toHaveBeenCalledWith(removeFromReadingList({ item: readingListItem }));
+  });
+
+  it('removeFromReadingList', () => {
+    const readingListItem = createReadingListItem('9U5I_tskq9MC');
+
+    const finishButton = fixture.debugElement.query(By.css('#markAsRead-9U5I_tskq9MC'));
+    finishButton.nativeElement.click();
+
+    expect(store.dispatch).toHaveBeenCalledWith(finishReadingBook({ item: readingListItem })
+    );
   });
 });

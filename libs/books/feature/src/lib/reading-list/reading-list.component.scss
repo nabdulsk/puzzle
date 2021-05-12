@@ -1,27 +1,66 @@
 @import 'variables.scss';
 
-h4{
-  margin:0;
+h4 {
+  margin: 0;
 }
 
 :host {
   display: block;
   font-size: 0.75rem;
 }
+
 .reading-list {
   padding: $spacing-xxs;
 }
 
 .reading-list-item {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   margin-bottom: $spacing-xs;
   width: 100%;
 
-  > * {
+  >* {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: left;
+    align-items: flex-start;
+  }
+
+  .reading-list-item--actions {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+
+    .mark-as-read {
+      border: none;
+      padding: 0px;
+      display: flex;
+      align-items: center;
+      color: #3a7241;
+      font-size: smaller;
+      font-weight: bold;
+      width: 70px;
+      cursor: pointer;
+
+      &.mark-as-finish {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        background-color: #bdddc1;
+
+        &:hover {
+          box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        }
+      }
+
+      &.finished {
+        cursor: default;
+      }
+
+      .mat-icon {
+        font-size: 16px;
+        position: relative;
+        top: 3px;
+      }
+    }
   }
 }
 
@@ -34,6 +73,7 @@ h4{
 .reading-list-item--details {
   flex: 1;
   min-width: 0;
+  max-width: 15rem;
   margin-right: $spacing-xxs;
 }
 

@@ -61,7 +61,16 @@ const readingListReducer = createReducer(
       { bookId: action.item.bookId, ...action.item },
       state
     )
-  )
+  ),
+  on(ReadingListActions.finishReadingBookSuccess, (state, action) =>
+    readingListAdapter.upsertOne(action.item, state)
+  ),
+  on(ReadingListActions.finishReadingBookError, (state, action) => {
+    return {
+      ...state,
+      error: action.error
+    };
+  })
 );
 
 export function reducer(state: State | undefined, action: Action) {

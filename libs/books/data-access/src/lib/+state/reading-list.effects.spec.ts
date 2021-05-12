@@ -77,12 +77,10 @@ describe('ToReadEffects', () => {
       actions.next(ReadingListActions.addToReadingList({ book: book }));
 
       effects.addBook$
-      .subscribe(action => {
-        expect(action).toEqual(
-          ReadingListActions.confirmedAddToReadingList({ book })
-        );
-        done();
-      });
+        .subscribe(action => {
+          expect(action).toEqual(ReadingListActions.confirmedAddToReadingList({ book }));
+          done();
+        });
 
       httpMock.expectOne({ url: '/api/reading-list', method: 'post' }).flush([]);
     });
@@ -93,12 +91,10 @@ describe('ToReadEffects', () => {
       actions.next(ReadingListActions.addToReadingList({ book: book }));
 
       effects.addBook$
-      .subscribe(action => {
-        expect(action).toEqual(
-          ReadingListActions.failedAddToReadingList({ book })
-        );
-        done();
-      });
+        .subscribe(action => {
+          expect(action).toEqual(ReadingListActions.failedAddToReadingList({ book }));
+          done();
+        });
 
       httpMock.expectOne({ url: '/api/reading-list', method: 'post' }).error(null);
     });
@@ -111,12 +107,10 @@ describe('ToReadEffects', () => {
       actions.next(ReadingListActions.removeFromReadingList({ item }));
 
       effects.removeBook$
-      .subscribe(action => {
-        expect(action).toEqual(
-          ReadingListActions.confirmedRemoveFromReadingList({ item })
-        );
-        done();
-      });
+        .subscribe(action => {
+          expect(action).toEqual(ReadingListActions.confirmedRemoveFromReadingList({ item }));
+          done();
+        });
 
       httpMock.expectOne({
         url: `/api/reading-list/${item.bookId}`,
@@ -130,12 +124,10 @@ describe('ToReadEffects', () => {
       actions.next(ReadingListActions.removeFromReadingList({ item }));
 
       effects.removeBook$
-      .subscribe(action => {
-        expect(action).toEqual(
-          ReadingListActions.failedRemoveFromReadingList({ item })
-        );
-        done();
-      });
+        .subscribe(action => {
+          expect(action).toEqual(ReadingListActions.failedRemoveFromReadingList({ item }));
+          done();
+        });
 
       httpMock.expectOne({
         url: `/api/reading-list/${item.bookId}`,
@@ -143,4 +135,45 @@ describe('ToReadEffects', () => {
       }).error(null);
     });
   });
+
+  describe('markBookAsFinished$', () => {
+    it('should change the finished status to true on  finishReadingBookSuccess', done => {
+      const item: ReadingListItem = createReadingListItem('A');
+      actions = new ReplaySubject();
+      actions.next(ReadingListActions.finishReadingBook({ item }));
+
+      const finishedBook = {
+        ...item,
+        finished: true,
+        finishedDate: new Date().toISOString()
+      };
+
+      effects.markBookAsFinished$
+        .subscribe(action => {
+          expect(action).toEqual(ReadingListActions.finishReadingBookSuccess({ item: finishedBook }));
+          done();
+        });
+
+      httpMock.expectOne({ url: `/api/reading-list/${item.bookId}/finished`, method: 'put' }).flush(finishedBook);
+    });
+
+    it('should handle error if finishReadingBook api faild', done => {
+      const item: ReadingListItem = createReadingListItem('A');
+      actions = new ReplaySubject();
+      actions.next(ReadingListActions.finishReadingBook({ item }));
+
+      const readingListAction = ReadingListActions.finishReadingBookError({
+        error: 'Internal Server Error'
+      });
+
+      effects.markBookAsFinished$
+        .subscribe(action => {
+          expect(action.type).toEqual(readingListAction.type);
+          done();
+        });
+
+      httpMock.expectOne({ url: `/api/reading-list/${item.bookId}/finished`, method: 'put' }).error(null);
+    });
+  });
+
 });
